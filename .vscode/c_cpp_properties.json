@@ -3,14 +3,14 @@
         {
             "name": "Target 1",
             "includePath": [
-                "c:\\Users\\29575\\Desktop\\Project\\第二次任务\\Start",
-                "c:\\Users\\29575\\Desktop\\Project\\第二次任务\\User",
-                "c:\\Users\\29575\\Desktop\\Project\\第二次任务\\Library",
-                "c:\\Users\\29575\\Desktop\\Project\\第二次任务\\System",
-                "c:\\Users\\29575\\Desktop\\Project\\第二次任务\\Hardware",
+                "c:\\Users\\29575\\Desktop\\Project\\Project2\\Start",
+                "c:\\Users\\29575\\Desktop\\Project\\Project2\\User",
+                "c:\\Users\\29575\\Desktop\\Project\\Project2\\Library",
+                "c:\\Users\\29575\\Desktop\\Project\\Project2\\System",
+                "c:\\Users\\29575\\Desktop\\Project\\Project2\\Hardware",
                 "C:\\Users\\29575\\Desktop\\STM32\\ARM\\ARMCC\\include",
                 "C:\\Users\\29575\\Desktop\\STM32\\ARM\\ARMCC\\include\\rw",
-                "c:\\Users\\29575\\Desktop\\Project\\第二次任务\\HardWare"
+                "c:\\Users\\29575\\Desktop\\Project\\Project2\\HardWare"
             ],
             "defines": [
                 "USE_STDPERIPH_DRIVER",
