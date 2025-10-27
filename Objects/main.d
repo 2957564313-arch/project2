@@ -34,4 +34,4 @@
 .\objects\main.o: .\Hardware\Key.h
 .\objects\main.o: .\System\Timer.h
 .\objects\main.o: .\Hardware\Encoder.h
-.\objects\main.o: .\Hardware\PWM.h
+.\objects\main.o: .\Hardware\Motor.h

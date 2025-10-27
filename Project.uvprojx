@@ -731,14 +731,14 @@
               <FilePath>.\Hardware\Encoder.h</FilePath>
             </File>
             <File>
-              <FileName>PWM.c</FileName>
+              <FileName>Motor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Hardware\PWM.c</FilePath>
+              <FilePath>.\Hardware\Motor.c</FilePath>
             </File>
             <File>
-              <FileName>PWM.h</FileName>
+              <FileName>Motor.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Hardware\PWM.h</FilePath>
+              <FilePath>.\Hardware\Motor.h</FilePath>
             </File>
           </Files>
         </Group>

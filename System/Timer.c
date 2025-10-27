@@ -2,7 +2,7 @@
 #include "Encoder.h"
 #include "Serial.h"
 #include "PID.h"
-#include "PWM.h"
+#include "Motor.h"
 
 extern float Actual;
 int32_t motor1_position = 0;

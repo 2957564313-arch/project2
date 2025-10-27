@@ -1,11 +1,11 @@
-\#include "stm32f10x.h"                  // Device header
+#include "stm32f10x.h"                  // Device header
 #include "OLED.h"
 #include "Serial.h"
 #include "PID.h"
 #include "Key.h"
 #include "Timer.h"
 #include "Encoder.h"
-#include "PWM.h"
+#include "Motor.h"
 
 uint8_t current_mode = 1;		//模式1为速度控制模式，模式2为位置跟随模式
 extern int16_t target_speed;

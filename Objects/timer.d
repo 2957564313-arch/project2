@@ -31,4 +31,4 @@
 .\objects\timer.o: .\Hardware\Encoder.h
 .\objects\timer.o: .\Hardware\Serial.h
 .\objects\timer.o: .\Hardware\PID.h
-.\objects\timer.o: .\Hardware\PWM.h
+.\objects\timer.o: .\Hardware\Motor.h
