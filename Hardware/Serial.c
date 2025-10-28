@@ -1,7 +1,6 @@
 #include "stm32f10x.h"                  // Device header
 #include <stdio.h>
 #include <string.h>
-#include "PID.h"
 
 int16_t target_speed = 0;
 
@@ -10,17 +9,19 @@ void Serial_Init(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1,ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);
 	
+	//配置TX引脚
 	GPIO_InitTypeDef GPIO_InitStruture;
 	GPIO_InitStruture.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStruture.GPIO_Pin =GPIO_Pin_9 ;
+	GPIO_InitStruture.GPIO_Pin =GPIO_Pin_9;
 	GPIO_InitStruture.GPIO_Speed =GPIO_Speed_50MHz ;
 	GPIO_Init(GPIOA,&GPIO_InitStruture);
 	
+	//配置RX引脚
 	GPIO_InitStruture.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_InitStruture.GPIO_Pin =GPIO_Pin_10 ;
-	GPIO_InitStruture.GPIO_Speed =GPIO_Speed_50MHz ;
+	GPIO_InitStruture.GPIO_Pin =GPIO_Pin_10;
 	GPIO_Init(GPIOA,&GPIO_InitStruture);
 	
+	//配置串口
 	USART_InitTypeDef USART_InitStruture;
 	USART_InitStruture.USART_BaudRate =115200 ;
 	USART_InitStruture.USART_HardwareFlowControl =USART_HardwareFlowControl_None ;
@@ -30,21 +31,22 @@ void Serial_Init(void)
 	USART_InitStruture.USART_WordLength = USART_WordLength_8b;
 	USART_Init(USART1,&USART_InitStruture);
 	
+	//使能接收中断
 	USART_ITConfig(USART1,USART_IT_RXNE,ENABLE);
 	
+	//配置NVIC
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	
 	NVIC_InitTypeDef NVIC_InitStruture;
-	NVIC_InitStruture.NVIC_IRQChannel =USART1_IRQn ;
-	NVIC_InitStruture.NVIC_IRQChannelCmd =ENABLE ;
-	NVIC_InitStruture.NVIC_IRQChannelPreemptionPriority = 1;
-	NVIC_InitStruture.NVIC_IRQChannelSubPriority =1 ;
+	NVIC_InitStruture.NVIC_IRQChannel =USART1_IRQn;
+	NVIC_InitStruture.NVIC_IRQChannelCmd =ENABLE;
+	NVIC_InitStruture.NVIC_IRQChannelPreemptionPriority =1;
+	NVIC_InitStruture.NVIC_IRQChannelSubPriority =1;
 	NVIC_Init(&NVIC_InitStruture);
 	
 	USART_Cmd(USART1,ENABLE);
 	
 }
-
 
 void USART1_IRQHandler(void)
 {
@@ -55,10 +57,6 @@ void USART1_IRQHandler(void)
         static uint8_t cmd_started = 0;
         
         char received_char = USART_ReceiveData(USART1);
-        
-        // 回显字符用于调试
-        USART_SendData(USART1, received_char);
-        while(USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
         
         if(received_char == '@') 
         {
@@ -71,17 +69,13 @@ void USART1_IRQHandler(void)
             if(received_char == '\r' || received_char == '\n') 
             {
                 cmd_buffer[cmd_index] = '\0';
-                
-                // 调试输出
-                printf("\nReceived command: %s\n", cmd_buffer);
-                
+               
                 // 解析速度命令
                 char *speed_cmd = strstr(cmd_buffer, "@speed%");
                 if(speed_cmd != NULL) 
                 {
                     char *number_str = speed_cmd + 7; // 跳过 "@speed%"
                     target_speed = atoi(number_str);
-                    printf("Target speed set to: %d\n", target_speed);
                 }
                 
                 cmd_started = 0;
@@ -103,7 +97,8 @@ void USART1_IRQHandler(void)
     }
 }
 
-int fputc(int ch,FILE *f)		//重定向printf，改变输出的目的地
+//重定向printf，改变输出的目的地
+int fputc(int ch,FILE *f)		
 {
 	USART_SendData(USART1,(uint8_t)ch);
 	
