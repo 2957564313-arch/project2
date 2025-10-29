@@ -4,10 +4,6 @@
 #include "PID.h"
 #include "Motor.h"
 
-extern float Actual;
-int32_t motor1_position = 0;
-int32_t motor2_target = 0;
-
 void Timer_Init(void)
 {
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2,ENABLE);

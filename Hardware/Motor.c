@@ -3,8 +3,8 @@
 #include "PID.h"
 #include "Serial.h"
 
- int32_t target_position2 = 0;
- int32_t last_position1 = 0;
+int32_t target_position2 = 0;
+int32_t last_position1 = 0;
 extern uint8_t current_mode;
 extern int16_t target_speed;
 
@@ -13,13 +13,15 @@ void PWM_Init(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO,ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2,ENABLE);
 	
+	//配置PWM引脚
 	GPIO_InitTypeDef GPIO_InitStruture;
 	GPIO_InitStruture.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStruture.GPIO_Pin = GPIO_Pin_2|GPIO_Pin_3;		//PWM
+	GPIO_InitStruture.GPIO_Pin = GPIO_Pin_2|GPIO_Pin_3;		
 	GPIO_InitStruture.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA,&GPIO_InitStruture);
 	
-	GPIO_InitStruture.GPIO_Pin = GPIO_Pin_12 |GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15;		//方向控制
+	//配置方向控制引脚
+	GPIO_InitStruture.GPIO_Pin = GPIO_Pin_12 |GPIO_Pin_13|GPIO_Pin_14|GPIO_Pin_15;
 	GPIO_InitStruture.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStruture.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB,&GPIO_InitStruture);
@@ -34,6 +36,7 @@ void PWM_Init(void)
 	TIM_TimeBaseStruture.TIM_RepetitionCounter = 0;
 	TIM_TimeBaseInit(TIM2,&TIM_TimeBaseStruture);
 	
+	//配置PWM通道
 	TIM_OCInitTypeDef TIM_OCInitStruture;
 	TIM_OCStructInit(&TIM_OCInitStruture);
 	TIM_OCInitStruture.TIM_OCMode = TIM_OCMode_PWM1;
@@ -62,37 +65,37 @@ void Motor_Set_Speed(uint8_t motor_num,int16_t speed)
 	{
 		if(speed >= 0)
 	{
+		//正转
 		GPIO_SetBits(GPIOB,GPIO_Pin_12);
-		GPIO_ResetBits(GPIOB,GPIO_Pin_13);
-			
+		GPIO_ResetBits(GPIOB,GPIO_Pin_13);		
 	}
 	else
 	{
+		//反转
 		GPIO_SetBits(GPIOB,GPIO_Pin_13);
 		GPIO_ResetBits(GPIOB,GPIO_Pin_12);
 		speed = -speed;
 	}
 	TIM_SetCompare3(TIM2,speed);		//将速度传入，改变占空比
 	}
-	
 	else if(motor_num == 2)
 	{
 		if(speed >= 0)
 	{
+		//正转
 		GPIO_SetBits(GPIOB,GPIO_Pin_14);
 		GPIO_ResetBits(GPIOB,GPIO_Pin_15);
 			
 	}
 	else
 	{
+		//反转
 		GPIO_SetBits(GPIOB,GPIO_Pin_15);
 		GPIO_ResetBits(GPIOB,GPIO_Pin_14);
 		speed = -speed;
 	}
 	TIM_SetCompare4(TIM2,speed);
-	}
-
-	
+	}	
 }
 void Motor_Process(void)		//电机控制处理，在定时器中断调用
 {
@@ -114,7 +117,7 @@ void Motor_Process(void)		//电机控制处理，在定时器中断调用
 	}
 	else
 	{
-		int32_t position1_change = Encoder_Get_Position(1) - last_position1;
+		int32_t position1_change = position1 - last_position1;
 		if(position1_change != 0)		
 		{
 			target_position2 += position1_change;

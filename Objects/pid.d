@@ -28,4 +28,3 @@
 .\objects\pid.o: .\Library\stm32f10x_usart.h
 .\objects\pid.o: .\Library\stm32f10x_wwdg.h
 .\objects\pid.o: .\Library\misc.h
-.\objects\pid.o: HardWare\Encoder.h

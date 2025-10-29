@@ -30,4 +30,5 @@
 .\objects\serial.o: .\Library\misc.h
 .\objects\serial.o: C:\Users\29575\Desktop\STM32\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\serial.o: C:\Users\29575\Desktop\STM32\ARM\ARMCC\Bin\..\include\string.h
-.\objects\serial.o: Hardware\PID.h
+.\objects\serial.o: Hardware\OLED.h
+.\objects\serial.o: C:\Users\29575\Desktop\STM32\ARM\ARMCC\Bin\..\include\stdlib.h

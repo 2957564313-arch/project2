@@ -1,6 +1,8 @@
 #include "stm32f10x.h"                  // Device header
 #include <stdio.h>
 #include <string.h>
+#include "OLED.h"
+#include <stdlib.h>
 
 int16_t target_speed = 0;
 
