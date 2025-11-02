@@ -3,6 +3,13 @@
 int32_t last_position1=0;
 int32_t target_position2=0;
 extern uint8_t current_mode;
+
+/**
+ * @brief PWM初始化 - 电机驱动
+ * 
+ * 配置TIM2的通道3和4为PWM输出，用于控制两个电机的速度
+ * 同时配置方向控制GPIO引脚
+ */
 void PWM_Init(void)
 {
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
@@ -42,6 +49,14 @@ void PWM_Init(void)
     TIM_Cmd(TIM2, ENABLE);
 }
 
+/**
+ * @brief 设置电机速度
+ * @param motor_num 电机编号：1-电机1，2-电机2
+ * @param speed 速度值：正数-正转，负数-反转，0-停止
+ * 
+ * 根据速度值设置电机的PWM占空比和转动方向
+ * 不同模式下有不同的限幅和死区处理策略
+ */
 void Motor_Set_Speed(uint8_t motor_num, int16_t speed)
 {
     
@@ -55,7 +70,7 @@ void Motor_Set_Speed(uint8_t motor_num, int16_t speed)
         if(speed > 200) speed = 200;
         if(speed < -200) speed = -200;
         
-        // 提高死区
+        // 提高死区：位置控制需要更精确，避免微小振荡
         if(speed > 0 && speed < 120) speed = 0;
         else if(speed < 0 && speed > -120) speed = 0;
     } else {

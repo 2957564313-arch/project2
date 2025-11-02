@@ -1,8 +1,14 @@
 #include "stm32f10x.h"
 
-static int32_t position1 = 0, position2 = 0;
-static int16_t last_count1 = 0, last_count2 = 0;
+static int32_t position1 = 0, position2 = 0;		// 静态变量：编码器位置累计值
+static int16_t last_count1 = 0, last_count2 = 0;		// 静态变量：上次编码器计数值，用于速度计算
 
+/**
+ * @brief 编码器初始化
+ * 
+ * 配置TIM3和TIM4为编码器模式，用于读取两个电机的旋转信息
+ * 编码器模式可以同时捕获A相和B相信号
+ */
 void Encoder_Init(void)
 {
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB, ENABLE);
@@ -43,7 +49,13 @@ void Encoder_Init(void)
     last_count2 = TIM_GetCounter(TIM4);
 }
 
-// 获取编码器速度（1ms内的脉冲数）
+/**
+ * @brief 获取编码器速度
+ * @param num 编码器编号：1-电机1，2-电机2
+ * @return 10ms内的脉冲变化量
+ * 
+ * 速度计算原理：本次计数值 - 上次计数值 = 10ms内的脉冲数
+ */
 int16_t Encoder_Get_Speed(uint8_t num)
 {
     int16_t current_count = 0;
@@ -77,7 +89,11 @@ int16_t Encoder_Get_Speed(uint8_t num)
     return (int16_t)delta*1.85;
 }
 
-// 获取编码器累计位置
+/**
+ * @brief 获取编码器累计位置
+ * @param num 编码器编号
+ * @return 从清零开始的累计脉冲数
+ */
 int32_t Encoder_Get_Position(uint8_t num)
 {
     if(num == 1)
@@ -86,7 +102,12 @@ int32_t Encoder_Get_Position(uint8_t num)
         return position2;
 }
 
-// 清零累计位置
+/**
+ * @brief 清零编码器累计位置
+ * @param num 编码器编号
+ * 
+ * 在位置模式切换时调用，重置位置基准
+ */
 void Encoder_Clear_TotalCount(uint8_t num)
 {
     if(num == 1)

@@ -6,6 +6,13 @@
 
 extern int16_t target_speed;
 
+/**
+ * @brief 串口初始化 - 115200波特率
+ * 
+ * 配置USART1用于与上位机通信：
+ * - 发送：编码器数据和状态信息
+ * - 接收：速度控制命令
+ */
 void Serial_Init(void)
 {
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
@@ -49,11 +56,19 @@ void Serial_Init(void)
     USART_Cmd(USART1, ENABLE);
 }
 
+/**
+ * @brief USART1中断服务函数 - 处理接收到的数据
+ * 
+ * 解析上位机发送的速度控制命令：
+ * 命令格式：@speed%数值
+ * 例如：@speed%10 设置目标速度为10
+ */
 void USART1_IRQHandler(void)
 {
-    static char cmd_buffer[32];
-    static uint8_t cmd_index = 0;
-    static uint8_t receiving_cmd = 0;
+	// 静态变量：命令缓冲区及相关状态
+    static char cmd_buffer[32];		// 命令缓冲区
+    static uint8_t cmd_index = 0;	 // 缓冲区索引
+    static uint8_t receiving_cmd = 0;	// 命令接收标志
     
     if(USART_GetITStatus(USART1, USART_IT_RXNE))
     {
@@ -62,9 +77,9 @@ void USART1_IRQHandler(void)
         // 检测命令开始符 '@'
         if(received_char == '@')
         {
-            receiving_cmd = 1;
-            cmd_index = 0;
-            cmd_buffer[cmd_index++] = received_char;
+            receiving_cmd = 1;	// 标记开始接收命令
+            cmd_index = 0;		// 重置缓冲区索引
+            cmd_buffer[cmd_index++] = received_char;	// 存储'@'字符
         }
         // 如果正在接收命令
         else if(receiving_cmd)
@@ -107,7 +122,15 @@ void USART1_IRQHandler(void)
         USART_ClearITPendingBit(USART1, USART_IT_RXNE);
     }
 }
-// 重定向printf
+
+/**
+ * @brief printf重定向函数
+ * @param ch 要发送的字符
+ * @param f 文件指针（未使用）
+ * @return 发送的字符
+ * 
+ * 将printf输出重定向到串口，方便调试信息输出
+ */
 int fputc(int ch, FILE *f)
 {
     USART_SendData(USART1, (uint8_t)ch);
@@ -116,7 +139,14 @@ int fputc(int ch, FILE *f)
 }
 
 
-// 发送数据到上位机 (速度1, 速度2, 位置1, 位置2)
+/**
+ * @brief 发送数据到上位机
+ * @param speed1 电机1实际速度
+ * @param target_speed 目标速度
+ * 
+ * 数据格式：实际速度,目标速度\n
+ * 方便上位机绘制速度曲线和监控系统状态
+ */
 void USART_Send_Data(int16_t speed1, int16_t target_speed)
 {
     printf("%d,%d\n", speed1, target_speed);

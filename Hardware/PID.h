@@ -13,6 +13,5 @@ int16_t Position_PID_Calculate(int32_t target, int32_t actual);
 
 // PID重置
 void Speed_PID_Reset(void);
-void Position_PID_Reset(void);
 
 #endif

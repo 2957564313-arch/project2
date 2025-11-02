@@ -19,7 +19,7 @@ uint8_t Key_GetNum(void)
     static uint8_t last_state = 1; // 默认上拉，未按下为1
     static uint32_t last_press_time = 0;
     uint8_t current_state = GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0);
-    uint32_t current_time = GetSystemTick(); // 需要实现获取系统滴答的函数
+    uint32_t current_time = GetSystemTick(); 
     
     // 检测按键按下（从1变为0）
     if(last_state == 1 && current_state == 0)
@@ -44,7 +44,6 @@ uint8_t Key_GetNum(void)
     return 0;
 }
 
-// 简单的系统滴答获取函数（如果还没有的话）
 volatile uint32_t system_tick = 0;
 
 
