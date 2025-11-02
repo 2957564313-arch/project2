@@ -2,6 +2,7 @@
 
 int32_t last_position1=0;
 int32_t target_position2=0;
+extern uint8_t current_mode;
 void PWM_Init(void)
 {
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
@@ -43,23 +44,35 @@ void PWM_Init(void)
 
 void Motor_Set_Speed(uint8_t motor_num, int16_t speed)
 {
+    
     // 限幅
     if(speed > 1000) speed = 1000;
     if(speed < -1000) speed = -1000;
     
-    // 优化死区补偿
-    if(speed > 0 && speed < 100) speed = 100;
-    else if(speed < 0 && speed > -100) speed = -100;
+    // 针对位置模式的特殊保护
+    if(current_mode == 2) {
+        // 在位置模式下，对两个电机都使用严格限制
+        if(speed > 200) speed = 200;
+        if(speed < -200) speed = -200;
+        
+        // 提高死区
+        if(speed > 0 && speed < 120) speed = 0;
+        else if(speed < 0 && speed > -120) speed = 0;
+    } else {
+        // 速度模式的正常死区
+        if(speed > 0 && speed < 30) speed = 0;
+        else if(speed < 0 && speed > -30) speed = 0;
+    }
     
     if(motor_num == 1)
     {
-        if(speed >= 0)
-        {
+        if(speed == 0) {
+            // 完全停止模式
+            GPIO_ResetBits(GPIOB, GPIO_Pin_12 | GPIO_Pin_13);
+        } else if(speed > 0) {
             GPIO_SetBits(GPIOB, GPIO_Pin_12);
             GPIO_ResetBits(GPIOB, GPIO_Pin_13);
-        }
-        else
-        {
+        } else {
             GPIO_ResetBits(GPIOB, GPIO_Pin_12);
             GPIO_SetBits(GPIOB, GPIO_Pin_13);
             speed = -speed;
@@ -68,13 +81,13 @@ void Motor_Set_Speed(uint8_t motor_num, int16_t speed)
     }
     else if(motor_num == 2)
     {
-        if(speed >= 0)
-        {
+        if(speed == 0) {
+            // 完全停止模式
+            GPIO_ResetBits(GPIOB, GPIO_Pin_14 | GPIO_Pin_15);
+        } else if(speed > 0) {
             GPIO_SetBits(GPIOB, GPIO_Pin_14);
             GPIO_ResetBits(GPIOB, GPIO_Pin_15);
-        }
-        else
-        {
+        } else {
             GPIO_ResetBits(GPIOB, GPIO_Pin_14);
             GPIO_SetBits(GPIOB, GPIO_Pin_15);
             speed = -speed;
