@@ -74,7 +74,7 @@ int16_t Encoder_Get_Speed(uint8_t num)
         position2 += delta;
     }
     
-    return delta;
+    return (int16_t)delta*1.85;
 }
 
 // 获取编码器累计位置
