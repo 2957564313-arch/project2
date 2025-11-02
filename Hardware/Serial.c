@@ -43,7 +43,7 @@ void Serial_Init(void)
     NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     NVIC_Init(&NVIC_InitStructure);
     
     USART_Cmd(USART1, ENABLE);
@@ -60,7 +60,7 @@ void USART1_IRQHandler(void)
         char received_char = USART_ReceiveData(USART1);
         
         // 检测命令开始符 '@'
-        if(received_char == '@' && !receiving_cmd)
+        if(received_char == '@')
         {
             receiving_cmd = 1;
             cmd_index = 0;
@@ -76,16 +76,15 @@ void USART1_IRQHandler(void)
                 {
                     cmd_buffer[cmd_index] = '\0';
                     
-                    // 解析 @speed%数值 格式
+                    // 立即解析 @speed%数值 格式
                     if(strncmp(cmd_buffer, "@speed%", 7) == 0)
                     {
-                        // 确保数字部分完整解析
                         char *num_str = cmd_buffer + 7;
                         if(strlen(num_str) > 0)
                         {
                             target_speed = atoi(num_str);
-                            // 可选：发送确认信息用于调试
-                            // printf("OK:%d\n", target_speed);
+                            // 立即重置速度PID以确保快速响应
+                            Speed_PID_Reset();
                         }
                     }
                 }
@@ -96,51 +95,6 @@ void USART1_IRQHandler(void)
             {
                 // 接收命令字符
                 cmd_buffer[cmd_index++] = received_char;
-                
-                // 实时解析：当收到完整的 @speed% 格式时立即处理
-                if(cmd_index >= 8 && strncmp(cmd_buffer, "@speed%", 7) == 0)
-                {
-                    // 检查是否已经收到完整的数字（以非数字字符或缓冲区满为结束）
-                    char current_char = cmd_buffer[cmd_index-1];
-                    if(current_char == '\r' || current_char == '\n' || 
-                       current_char == ' ' || current_char == '@' ||
-                       !((current_char >= '0' && current_char <= '9') || 
-                         current_char == '-' || current_char == '+'))
-                    {
-                        // 遇到命令结束符或非法字符，立即处理之前的数字
-                        char temp = cmd_buffer[cmd_index-1];
-                        cmd_buffer[cmd_index-1] = '\0'; // 临时结束字符串
-                        
-                        char *num_str = cmd_buffer + 7;
-                        if(strlen(num_str) > 0)
-                        {
-                            target_speed = atoi(num_str);
-                        }
-                        
-                        // 重置接收状态，开始新的命令
-                        receiving_cmd = 0;
-                        cmd_index = 0;
-                        
-                        // 如果当前字符是新的命令开始符，立即开始新命令
-                        if(temp == '@')
-                        {
-                            receiving_cmd = 1;
-                            cmd_buffer[cmd_index++] = temp;
-                        }
-                    }
-                    else if(cmd_index == 31)
-                    {
-                        // 缓冲区满，立即处理
-                        cmd_buffer[cmd_index] = '\0';
-                        char *num_str = cmd_buffer + 7;
-                        if(strlen(num_str) > 0)
-                        {
-                            target_speed = atoi(num_str);
-                        }
-                        receiving_cmd = 0;
-                        cmd_index = 0;
-                    }
-                }
             }
             else
             {
@@ -163,7 +117,7 @@ int fputc(int ch, FILE *f)
 
 
 // 发送数据到上位机 (速度1, 速度2, 位置1, 位置2)
-void USART_Send_Data(int16_t speed1, int16_t speed2, long pos1, long pos2)
+void USART_Send_Data(int16_t speed1, int16_t target_speed)
 {
-    printf("%d,%d,%ld,%ld\n", speed1, speed2, pos1, pos2);
+    printf("%d,%d\n", speed1, target_speed);
 }
