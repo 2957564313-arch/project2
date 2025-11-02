@@ -7,11 +7,13 @@
 #include "Encoder.h"
 #include "Motor.h"
 
-uint8_t current_mode = 2; // 1:速度控制模式, 2:位置跟随模式
+uint8_t current_mode = 1; // 1:速度控制模式, 2:位置跟随模式
 int16_t target_speed = 0;
 
 int main(void)
 {
+	
+	
     // 初始化所有外设
     Key_Init();
     OLED_Init();
@@ -21,8 +23,10 @@ int main(void)
     PWM_Init();
     
     // 设置PID参数 - 优化位置PID参数减少振动
-    Speed_PID_SetParams(5.0f, 2.0f, 1.0f);
-    Position_PID_SetParams(0.15199f, 0.0f, 0.50f); // 减小位置PID参数
+    // 在main函数中修改PID初始化参数：
+// 设置PID参数 - 优化位置PID参数大幅减少振动
+Speed_PID_SetParams(5.0f, 1.5f, 0.5f);
+Position_PID_SetParams(0.15f, 0.01f, 0.03f); // 纯比例控制，增益非常低 // 减小位置PID参数
     
     // 初始化电机停止
     GPIO_ResetBits(GPIOB, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
@@ -34,6 +38,7 @@ int main(void)
     OLED_ShowNum(1, 6, current_mode, 1);
     OLED_ShowString(2, 1, "Speed Control");
     
+	
     while(1)
     {
         // 检测按键切换模式
